@@ -10,6 +10,7 @@ import AdminHome from "./pages/AdminHome";
 import CreateTemplate from "./pages/CreateTemplate";
 import CreateLab from "./pages/CreateLab";
 import VncTest from "./pages/VncTest";
+import LabExam from "./pages/LabExam";
 import "./index.css";
 
 
@@ -46,6 +47,11 @@ const App = () => {
           } />
           <Route path="/admin/create-lab" element={
             <RoleRoute role="ADMIN"><CreateLab /></RoleRoute>
+          } />
+          <Route path="/exam/:labId" element={
+            <ProtectedRoute>
+              <LabExam />
+            </ProtectedRoute>
           } />
         </Routes>
       </AuthProvider>
