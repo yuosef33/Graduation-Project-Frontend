@@ -17,6 +17,7 @@ const CreateTemplate = () => {
     const retryRef = useRef(null);
     const cancellingRef = useRef(false);
     const vncContainerRef = useRef(null);
+    const [loadingMessage, setLoadingMessage] = useState("Starting your VM...");
 
     // restore vm from localStorage on refresh
     useEffect(() => {
@@ -45,7 +46,25 @@ const CreateTemplate = () => {
                 };
             }
         }, [step]);
+    useEffect(() => {
+        if (step !== "vnc") return;
 
+        const messages = [
+            { time: 0,     msg: "Starting your VM..." },
+            { time: 30000, msg: "Windows is booting..." },
+            { time: 60000, msg: "Starting VNC server..." },
+            { time: 90000, msg: "Almost ready, connecting..." },
+        ];
+
+        const timers = messages.map(({ time, msg }) =>
+            setTimeout(() => setLoadingMessage(msg), time)
+        );
+
+        // reset when connected
+        if (!connecting) setLoadingMessage("Starting your VM...");
+
+        return () => timers.forEach(clearTimeout);
+    }, [step]);
     // listen for fullscreen exit via ESC key
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -252,7 +271,8 @@ const CreateTemplate = () => {
                             {connecting && (
                                 <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-3 z-10">
                                     <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    <p className="text-white text-sm">Connecting to VM... retrying every 5 seconds</p>
+                                    <p className="text-white text-sm">{loadingMessage}</p>
+                                    <p className="text-gray-500 text-xs">please wait...</p>
                                 </div>
                             )}
 
