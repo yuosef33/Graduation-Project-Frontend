@@ -128,13 +128,20 @@ const LabExam = () => {
 
   // VNC auto retry
   useEffect(() => {
-    if (step === "vnc") {
-      setConnecting(true);
-      retryRef.current = setInterval(() => {
-        setVncKey(prev => prev + 1);
-      }, 5000);
-    }
-    return () => clearInterval(retryRef.current);
+      if (step === "vnc") {
+          setConnecting(true);
+
+          const initialDelay = setTimeout(() => {
+              retryRef.current = setInterval(() => {
+                  setVncKey(prev => prev + 1);
+              }, 15000);
+          }, 60000);
+
+          return () => {
+              clearTimeout(initialDelay);
+              clearInterval(retryRef.current);
+          };
+      }
   }, [step]);
 
   // fullscreen exit via ESC

@@ -27,16 +27,24 @@ const CreateTemplate = () => {
         }
     }, []);
 
-    // auto retry VNC every 5 seconds
-    useEffect(() => {
-        if (step === "vnc") {
-            setConnecting(true);
-            retryRef.current = setInterval(() => {
-                setVncKey(prev => prev + 1);
-            }, 5000);
-        }
-        return () => clearInterval(retryRef.current);
-    }, [step]);
+        useEffect(() => {
+            if (step === "vnc") {
+                setConnecting(true);
+
+                // wait 60 seconds before even trying — give Windows time to boot
+                const initialDelay = setTimeout(() => {
+                    // then retry every 15 seconds — not 5
+                    retryRef.current = setInterval(() => {
+                        setVncKey(prev => prev + 1);
+                    }, 15000); // ← 15 seconds not 5
+                }, 60000); // ← wait 60 seconds first
+
+                return () => {
+                    clearTimeout(initialDelay);
+                    clearInterval(retryRef.current);
+                };
+            }
+        }, [step]);
 
     // listen for fullscreen exit via ESC key
     useEffect(() => {
