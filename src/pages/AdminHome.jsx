@@ -36,7 +36,7 @@ const AdminHome = () => {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
 
           {/* Create Template */}
           <div
@@ -95,6 +95,36 @@ const AdminHome = () => {
 
             <p className="text-sm text-gray-700">
               Configure and schedule a new lab exam
+            </p>
+          </div>
+
+          {/* View My Labs */}
+          <div
+            onClick={() => navigate("/admin/my-labs")}
+            className="cursor-pointer rounded-2xl p-6 border-2 border-purple-200 
+                       bg-gradient-to-br from-purple-50 to-purple-100
+                       hover:border-purple-400 hover:shadow-lg hover:-translate-y-1 
+                       transition-all duration-200"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 flex items-center justify-center bg-white border border-purple-200 rounded-xl">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9 5h6m-6 4h6m-6 4h4m-7 8h10a2 2 0 002-2V5a2 2 0 00-2-2H8.5L5 6.5V19a2 2 0 002 2z" />
+                </svg>
+              </div>
+
+              <span className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full border border-purple-300">
+                STATUS
+              </span>
+            </div>
+
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              View My Labs
+            </h2>
+
+            <p className="text-sm text-gray-700">
+              See labs you created and their current status
             </p>
           </div>
 
