@@ -42,6 +42,7 @@ const CreateLab = () => {
       labDescription: "",
       labInstructions: "",
       labDuration: "",
+      fileDirectory: "",
       labStartTime: "",
       labTemplateId: "",
     },
@@ -53,6 +54,7 @@ const CreateLab = () => {
           labDescription: values.labDescription,
           labInstructions: values.labInstructions,
           labDuration: parseInt(values.labDuration),
+          fileDirectory: values.fileDirectory.trim() || null,
           labStartTime: values.labStartTime,
           labTemplateId: parseInt(values.labTemplateId),
         });
@@ -141,6 +143,15 @@ const CreateLab = () => {
               {...formik.getFieldProps("labDuration")}
               error={formik.errors.labDuration}
               touched={formik.touched.labDuration}
+            />
+
+            <InputField
+              label="File Directory (optional)"
+              type="text"
+              placeholder="e.g. /home/student/lab-files"
+              {...formik.getFieldProps("fileDirectory")}
+              error={formik.errors.fileDirectory}
+              touched={formik.touched.fileDirectory}
             />
 
             <InputField
