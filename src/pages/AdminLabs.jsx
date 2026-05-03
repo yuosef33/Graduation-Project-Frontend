@@ -8,6 +8,10 @@ const AdminLabs = () => {
   const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [collectingLabId, setCollectingLabId] = useState(null);
+  const [loadingFilesLabId, setLoadingFilesLabId] = useState(null);
+  const [openFilesLabId, setOpenFilesLabId] = useState(null);
+  const [filesByLabId, setFilesByLabId] = useState({});
+  const [downloadingStudentKey, setDownloadingStudentKey] = useState(null);
 
   useEffect(() => {
     api.get("/lab/getMyLabs")
@@ -49,6 +53,56 @@ const AdminLabs = () => {
     return date.toLocaleString();
   };
 
+  const formatFileSize = (size) => {
+    if (size === null || size === undefined) return "-";
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const getFileGroups = (labId) => Object.entries(filesByLabId[labId] || {});
+
+  const getFileCount = (labId) =>
+    getFileGroups(labId).reduce(
+      (total, [, files]) => total + (Array.isArray(files) ? files.length : 0),
+      0
+    );
+
+  const fetchLabFiles = async (labId) => {
+    setLoadingFilesLabId(labId);
+
+    try {
+      const res = await api.get(`/lab/labs/${labId}/files`);
+      const fileGroups = res.data?.data && typeof res.data.data === "object"
+        ? res.data.data
+        : {};
+
+      setFilesByLabId((currentFiles) => ({
+        ...currentFiles,
+        [labId]: fileGroups,
+      }));
+      setOpenFilesLabId(labId);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to load lab files");
+    } finally {
+      setLoadingFilesLabId(null);
+    }
+  };
+
+  const handleToggleFiles = async (labId) => {
+    if (openFilesLabId === labId) {
+      setOpenFilesLabId(null);
+      return;
+    }
+
+    if (filesByLabId[labId]) {
+      setOpenFilesLabId(labId);
+      return;
+    }
+
+    await fetchLabFiles(labId);
+  };
+
   const handleCollectFiles = async (labId) => {
     setCollectingLabId(labId);
 
@@ -60,12 +114,51 @@ const AdminLabs = () => {
         )
       );
       toast.success("Files collected successfully");
+      await fetchLabFiles(labId);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to collect files");
     } finally {
       setCollectingLabId(null);
     }
   };
+
+  const getDownloadFileName = (contentDisposition, labId, studentId) => {
+    const match = contentDisposition?.match(/filename="?([^"]+)"?/);
+    return match?.[1] || `student-${studentId}-lab-${labId}.zip`;
+  };
+
+  const handleDownloadStudentFiles = async (labId, studentId) => {
+    const downloadKey = `${labId}-${studentId}`;
+    setDownloadingStudentKey(downloadKey);
+
+    try {
+      const res = await api.get(`/lab/labs/${labId}/files/${studentId}/download`, {
+        responseType: "blob",
+      });
+      const fileName = getDownloadFileName(
+        res.headers["content-disposition"],
+        labId,
+        studentId
+      );
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to download files");
+    } finally {
+      setDownloadingStudentKey(null);
+    }
+  };
+
+  const selectedLab = labs.find((lab) => lab.labId === openFilesLabId);
+  const selectedFileGroups = selectedLab ? getFileGroups(selectedLab.labId) : [];
+  const selectedFileCount = selectedLab ? getFileCount(selectedLab.labId) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -163,8 +256,22 @@ const AdminLabs = () => {
 
                 {lab.labStatus === "FINISHED" && (
                   lab.collected ? (
-                    <div className="mt-5 w-full py-2.5 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium text-center">
-                      Collected
+                    <div className="mt-5 flex flex-col gap-3">
+                      <div className="w-full py-2.5 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium text-center">
+                        Collected
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFiles(lab.labId)}
+                        disabled={loadingFilesLabId === lab.labId}
+                        className="w-full py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      >
+                        {loadingFilesLabId === lab.labId
+                          ? "Loading Files..."
+                          : openFilesLabId === lab.labId
+                            ? "Files Open"
+                            : "View Files"}
+                      </button>
                     </div>
                   ) : (
                     <button
@@ -182,6 +289,111 @@ const AdminLabs = () => {
           </div>
         )}
       </div>
+
+      {selectedLab && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 px-4 py-6">
+          <div className="w-full max-w-4xl max-h-[88vh] overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-200">
+            <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-5">
+              <div>
+                <p className="text-xs font-medium text-gray-500">Collected Files</p>
+                <h2 className="text-lg font-semibold text-gray-900 mt-1">
+                  {selectedLab.labName}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {selectedFileCount} file{selectedFileCount === 1 ? "" : "s"} across{" "}
+                  {selectedFileGroups.length} user
+                  {selectedFileGroups.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenFilesLabId(null)}
+                className="h-9 w-9 shrink-0 rounded-full border border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                aria-label="Close files"
+              >
+                X
+              </button>
+            </div>
+
+            <div className="max-h-[68vh] overflow-y-auto px-6 py-5">
+              {selectedFileGroups.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center">
+                  <p className="text-sm text-gray-500">No files found for this lab.</p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {selectedFileGroups.map(([userId, files]) => {
+                    const userFiles = Array.isArray(files) ? files : [];
+
+                    return (
+                      <section key={userId} className="rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="flex items-center justify-between bg-gray-50 px-4 py-3 border-b border-gray-200">
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900">
+                              User #{userId}
+                            </h3>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {userFiles.length} file{userFiles.length === 1 ? "" : "s"}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadStudentFiles(selectedLab.labId, userId)}
+                            disabled={
+                              userFiles.length === 0 ||
+                              downloadingStudentKey === `${selectedLab.labId}-${userId}`
+                            }
+                            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {downloadingStudentKey === `${selectedLab.labId}-${userId}`
+                              ? "Downloading..."
+                              : "Download All"}
+                          </button>
+                        </div>
+
+                        {userFiles.length === 0 ? (
+                          <p className="px-4 py-4 text-sm text-gray-500">
+                            No files for this user.
+                          </p>
+                        ) : (
+                          <div className="divide-y divide-gray-100">
+                            {userFiles.map((file, index) => (
+                              <div
+                                key={`${userId}-${file.fileName}-${index}`}
+                                className="grid gap-3 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center"
+                              >
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {file.fileName}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-0.5">
+                                    {file.downloadUrl}
+                                  </p>
+                                </div>
+                                <p className="text-sm text-gray-600 md:text-right">
+                                  {formatFileSize(file.size)}
+                                </p>
+                                <a
+                                  href={file.downloadUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+                                >
+                                  Download
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </section>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
