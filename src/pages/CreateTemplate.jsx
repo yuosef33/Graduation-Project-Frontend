@@ -265,7 +265,7 @@ const CreateTemplate = () => {
                         <div
                             ref={vncContainerRef}
                             className="bg-black rounded-2xl overflow-hidden relative"
-                            style={{ height: "500px" }}
+                            style={{ height: "70vh" }}
                         >
                             {/* connecting overlay */}
                             {connecting && (
@@ -304,6 +304,7 @@ const CreateTemplate = () => {
                                 key={vncKey}
                                 url={`ws://${vmData.ip}:6080`}
                                 scaleViewport
+                                resizeSession
                                 style={{ width: "100%", height: "100%" }}
                                 onConnect={handleVncConnect}
                                 onDisconnect={handleVncDisconnect}

@@ -254,6 +254,7 @@ export default function LabExam() {
             key={vncKey}
             url={`ws://${vmData.publicIp}:6080`}
             scaleViewport
+            resizeSession
             style={{ width: "100%", height: "100%" }}
             onConnect={handleVncConnect}
             onDisconnect={handleVncDisconnect}
