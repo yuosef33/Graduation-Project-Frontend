@@ -23,6 +23,16 @@ const Home = () => {
     navigate("/login");
   };
 
+  const handleAttendExam = (lab) => {
+    const confirmed = window.confirm(
+      `Attend "${lab.labName}" now? Your exam VM will start and the timer will continue.`
+    );
+
+    if (confirmed) {
+      navigate(`/exam/${lab.labId}`);
+    }
+  };
+
   const getStatusStyle = (status) => {
     switch (status) {
       case "RUNNING":
@@ -160,7 +170,7 @@ const Home = () => {
                 {/* actions */}
                 {lab.labStatus === "RUNNING" && (
                   <button
-                    onClick={() => navigate(`/exam/${lab.labId}`)}
+                    onClick={() => handleAttendExam(lab)}
                     className="w-full py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800"
                   >
                     Attend Exam

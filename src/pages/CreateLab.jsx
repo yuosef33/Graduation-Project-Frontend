@@ -6,6 +6,11 @@ import api from "../api/axios";
 import toast from "react-hot-toast";
 import InputField from "../components/InputField";
 
+const fileDirectoryPresets = [
+  { label: "Windows Desktop", value: "C:\\Users\\Public\\Desktop\\" },
+  { label: "Linux Desktop", value: "/home/ubuntu/Desktop/" },
+];
+
 const validationSchema = Yup.object({
   labName: Yup.string().required("Lab name is required"),
   labDescription: Yup.string().required("Description is required"),
@@ -153,6 +158,18 @@ const CreateLab = () => {
               error={formik.errors.fileDirectory}
               touched={formik.touched.fileDirectory}
             />
+            <div className="flex flex-wrap gap-2 -mt-2">
+              {fileDirectoryPresets.map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => formik.setFieldValue("fileDirectory", preset.value)}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-xs font-medium text-gray-700 hover:bg-white hover:border-gray-300 transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
 
             <InputField
               label="Start Time"

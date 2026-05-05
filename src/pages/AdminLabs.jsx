@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
+
+const COLLECTION_PROCESSING_DELAY_MS = 45000;
 
 const AdminLabs = () => {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ const AdminLabs = () => {
   const [openFilesLabId, setOpenFilesLabId] = useState(null);
   const [filesByLabId, setFilesByLabId] = useState({});
   const [downloadingStudentKey, setDownloadingStudentKey] = useState(null);
+  const collectingRef = useRef(false);
 
   useEffect(() => {
     api.get("/lab/getMyLabs")
@@ -68,6 +71,11 @@ const AdminLabs = () => {
       0
     );
 
+  const waitForCollectionProcessing = () =>
+    new Promise((resolve) => {
+      setTimeout(resolve, COLLECTION_PROCESSING_DELAY_MS);
+    });
+
   const fetchLabFiles = async (labId) => {
     setLoadingFilesLabId(labId);
 
@@ -95,30 +103,33 @@ const AdminLabs = () => {
       return;
     }
 
-    if (filesByLabId[labId]) {
+  if (filesByLabId[labId]) {
       setOpenFilesLabId(labId);
       return;
     }
 
     await fetchLabFiles(labId);
   };
-
   const handleCollectFiles = async (labId) => {
+    if (collectingRef.current) return; // prevent double trigger
+    collectingRef.current = true;
     setCollectingLabId(labId);
 
     try {
       await api.post(`/lab/collectAll/${labId}`);
+      toast.success("File collection started. Preparing files...");
+      await waitForCollectionProcessing();
       setLabs((currentLabs) =>
         currentLabs.map((lab) =>
           lab.labId === labId ? { ...lab, collected: true } : lab
         )
       );
-      toast.success("Files collected successfully");
-      await fetchLabFiles(labId);
+      toast.success("Files are ready");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to collect files");
     } finally {
       setCollectingLabId(null);
+      collectingRef.current = false;
     }
   };
 
