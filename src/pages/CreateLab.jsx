@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import InputField from "../components/InputField";
 
 const fileDirectoryPresets = [
-  { label: "Windows Desktop", value: "C:\\Users\\Public\\Desktop\\" },
+  { label: "Windows Desktop", value: "C:\\Users\\Administrator\\Desktop\\" },
   { label: "Linux Desktop", value: "/home/ubuntu/Desktop/" },
 ];
 

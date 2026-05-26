@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 
-const COLLECTION_PROCESSING_DELAY_MS = 45000;
+const COLLECTION_PROCESSING_DELAY_MS = 70000;
 
 const AdminLabs = () => {
   const navigate = useNavigate();
@@ -370,16 +370,14 @@ const AdminLabs = () => {
                           <div className="divide-y divide-gray-100">
                             {userFiles.map((file, index) => (
                               <div
-                                key={`${userId}-${file.fileName}-${index}`}
+                              key={`${userId}-${file.filePath}-${index}`}
                                 className="grid gap-3 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center"
                               >
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium text-gray-900 truncate">
-                                    {file.fileName}
+                                    {file.filePath}
                                   </p>
-                                  <p className="text-xs text-gray-500 mt-0.5">
-                                    {file.downloadUrl}
-                                  </p>
+                                  
                                 </div>
                                 <p className="text-sm text-gray-600 md:text-right">
                                   {formatFileSize(file.size)}

@@ -4,7 +4,7 @@ const VncTest = () => {
   return (
     <div style={{ width: "100vw", height: "100vh", background: "black" }}>
       <VncScreen
-        url="ws://3.71.3.160:6080"
+        url="ws://3.70.46.250:6080"
         scaleViewport
         resizeSession
         onClipboard={(e) => console.log("Clipboard event:", e.detail.text)}
