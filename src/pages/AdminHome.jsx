@@ -19,7 +19,7 @@ const AdminHome = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Instructor Dashboard</h1>
             <p className="text-gray-600 text-sm">{user?.email}</p>
           </div>
 
