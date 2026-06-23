@@ -1,6 +1,6 @@
 # 🎨 Cloud-Based Lab Examination Platform - Frontend
 
-> React frontend for the Cloud-Based Lab Examination Platform. Provides browser-based access to cloud-hosted Windows and Linux virtual machines, lab management dashboards, authentication, and real-time exam interaction.
+> Frontend application for the Cloud-Based Lab Examination Platform, built with React and Vite. Provides browser-based access to cloud-hosted Windows and Linux virtual machines, authentication, lab management, and exam interaction.
 
 🔗 **Backend Repository:** https://github.com/yuosef33/Cloud-Based-Examination-Platform
 
@@ -8,107 +8,75 @@
 
 ## 📌 Overview
 
-The frontend serves as the user interface for the Cloud-Based Lab Examination Platform. It allows students and instructors to interact with the system through a modern web application built with React and Vite.
+The frontend provides the user interface for the Cloud-Based Lab Examination Platform. It enables students and instructors to interact with the system through a modern web application built with React.
 
-Students can attend practical labs, access dedicated Windows or Linux virtual machines directly from the browser using VNC technology, monitor remaining exam time, and reconnect to their assigned machine at any point during the lab session.
+Students can browse available labs, attend exams, and access dedicated Windows or Linux virtual machines directly from the browser using VNC technology.
 
-Instructors can create and manage lab templates, schedule exams, monitor student environments, collect submissions, and download student files through an intuitive dashboard.
+Administrators can create VM templates, manage labs, monitor exam sessions, and collect student submissions through dedicated dashboard pages.
 
 ---
 
-## 🎯 Key Features
+## 🎯 Features
 
-* 🌐 Browser-based access to Windows and Linux VMs
-* 🖥️ Integrated VNC client using react-vnc/noVNC
-* 🔐 JWT Authentication & Google OAuth2 Login
-* 👥 Role-based routing and protected pages
-* ⏱️ Real-time exam countdown timer
-* 📋 Lab and template management dashboards
-* 📁 Student submission and file management
-* 🔄 Automatic VM reconnection support
-* 📱 Responsive user interface
-* ⚡ Fast development experience with Vite
+* 🔐 JWT Authentication
+* 🔑 Google OAuth2 Login
+* 👥 Role-Based Route Protection
+* 🖥️ Browser-Based VNC Access
+* 🪟🐧 Support for Windows and Linux VMs
+* ⏱️ Exam Session Interface
+* 📋 Lab Management
+* 🏗️ Template Management
+* 📱 Responsive User Interface
+* ⚡ Fast Development Experience with Vite
 
 ---
 
 ## 🧰 Built With
 
-* React 19
-* Vite
-* Tailwind CSS
-* React Router DOM
-* Axios
-* Formik
-* Yup
-* react-vnc
-* JWT Authentication
-
----
-
-## 🏗️ Frontend Architecture
-
-```text
-React Application
-│
-├── Authentication
-│   ├── Login
-│   ├── Register
-│   └── Google OAuth2
-│
-├── Student Portal
-│   ├── Available Labs
-│   ├── Exam Details
-│   ├── VM Access
-│   └── Countdown Timer
-│
-├── Admin Dashboard
-│   ├── Template Management
-│   ├── Lab Management
-│   ├── Student Monitoring
-│   └── File Collection
-│
-└── Shared Components
-    ├── Protected Routes
-    ├── Forms
-    ├── Navigation
-    └── VNC Components
-```
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge\&logo=react\&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge\&logo=tailwind-css\&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-D0021B?style=for-the-badge\&logo=react-router\&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge)
+![Formik](https://img.shields.io/badge/Formik-2563EB?style=for-the-badge)
+![Yup](https://img.shields.io/badge/Yup-111827?style=for-the-badge)
+![VNC](https://img.shields.io/badge/react--vnc-FF6B35?style=for-the-badge)
 
 ---
 
 ## 🖥️ Browser-Based VM Access
 
-The platform integrates react-vnc to provide direct browser access to cloud-hosted virtual machines.
+Students interact with cloud-hosted virtual machines directly from the browser through a VNC client.
 
 Connection Flow:
 
 ```text
 React Frontend
-        ↓
+       ↓
 WebSocket
-        ↓
+       ↓
 Websockify
-        ↓
+       ↓
 TigerVNC
-        ↓
+       ↓
 Windows / Linux VM
 ```
 
-Students interact with a full remote desktop without installing any software.
+No additional software installation is required.
 
 ---
 
 ## 🔐 Authentication
 
-Supported authentication methods:
+Supported Authentication Methods:
 
 * Email & Password Login
 * Google OAuth2 Login
 * JWT Access Tokens
-* Refresh Token Support
 * Protected Routes
+* Role-Based Authorization
 
-User Roles:
+Roles:
 
 * ADMIN
 * USER
@@ -119,16 +87,53 @@ User Roles:
 
 ```text
 src/
-├── components/
-├── pages/
-├── layouts/
-├── services/
-├── hooks/
-├── context/
-├── routes/
+├── api/
+│   └── axios.js
+│
 ├── assets/
-└── utils/
+│
+├── components/
+│   ├── InputField.jsx
+│   ├── LoginForm.jsx
+│   ├── SignupForm.jsx
+│   ├── ProtectedRoute.jsx
+│   └── RoleRoute.jsx
+│
+├── context/
+│   └── AuthContext.jsx
+│
+├── pages/
+│   ├── Login.jsx
+│   ├── Signup.jsx
+│   ├── OAuthCallback.jsx
+│   ├── Home.jsx
+│   ├── LabExam.jsx
+│   ├── AdminHome.jsx
+│   ├── AdminLabs.jsx
+│   ├── CreateLab.jsx
+│   ├── CreateTemplate.jsx
+│   └── VncTest.jsx
+│
+├── App.jsx
+└── main.jsx
 ```
+
+---
+
+## 📄 Main Pages
+
+| Page           | Description                     |
+| -------------- | ------------------------------- |
+| Login          | User authentication             |
+| Signup         | User registration               |
+| OAuthCallback  | Google OAuth2 callback handling |
+| Home           | Student dashboard               |
+| LabExam        | Exam session and VM access      |
+| AdminHome      | Admin dashboard                 |
+| AdminLabs      | Lab management                  |
+| CreateLab      | Create and schedule labs        |
+| CreateTemplate | Create VM templates             |
+| VncTest        | VNC testing page                |
 
 ---
 
@@ -144,7 +149,7 @@ npm install
 npm run dev
 ```
 
-Application:
+Application will be available at:
 
 ```text
 http://localhost:5173
@@ -156,7 +161,6 @@ http://localhost:5173
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080
-VITE_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
 ---
@@ -170,5 +174,8 @@ Individual Graduation Project
 * LinkedIn: https://www.linkedin.com/in/yuosefjamal33/
 * GitHub: https://github.com/yuosef33
 
-```
-```
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
