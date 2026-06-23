@@ -2,7 +2,7 @@
 
 > React frontend for the Cloud-Based Lab Examination Platform. Provides browser-based access to cloud-hosted Windows and Linux virtual machines, lab management dashboards, authentication, and real-time exam interaction.
 
-🔗 **Backend Repository:** https://github.com/yuosef33/Cloud-Based-Examintation-Platform
+🔗 **Backend Repository:** https://github.com/yuosef33/Cloud-Based-Examination-Platform
 
 ---
 
